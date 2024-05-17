@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:todoapp/pages/intro_page.dart';
 import 'package:todoapp/services/firestore.dart';
 
@@ -23,6 +24,7 @@ class _TaskPageState extends State<TaskPage> {
       appBar: AppBar(
         title: Text("Notes"),
       ),
+      //drawer to navigate to other pages
       drawer: Drawer(
         child: Container(
           color: Colors.grey[300],
@@ -114,48 +116,53 @@ class _TaskPageState extends State<TaskPage> {
               String noteText = data['note'];
 
               // Display as a list tile
-              return Container(
-                margin: const EdgeInsets.all(15),
-                decoration: BoxDecoration(
-                  color: Colors.grey[300],
-                  borderRadius: BorderRadius.circular(15.0),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.shade500,
-                      spreadRadius: 1,
-                      blurRadius: 15,
-                      offset: const Offset(4.0, 4.0),
+              return Slidable(
+                endActionPane: ActionPane(
+                  motion: StretchMotion(),
+                  children: [
+                    //update button
+                    SlidableAction(
+                      onPressed: (context) {
+                        openNoteBox(docId: docID);
+                      },
+                      flex: 2,
+                      borderRadius: BorderRadius.circular(10),
+                      backgroundColor: Colors.blue,
+                      icon: Icons.edit,
                     ),
-                    BoxShadow(
-                      color: Colors.white,
-                      spreadRadius: 1,
-                      blurRadius: 15,
-                      offset: const Offset(-4.0, -4.0),
+                    //delete button
+                    SlidableAction(
+                      onPressed: (context) {
+                        firestoreService.deleteNote(docID);
+                      },
+                      borderRadius: BorderRadius.circular(10),
+                      backgroundColor: Colors.red,
+                      icon: Icons.delete,
                     ),
                   ],
                 ),
-                child: ListTile(
-                  title: Text(noteText),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      //update button
-                      IconButton(
-                        onPressed: () {
-                          openNoteBox(docId: docID);
-                        },
-                        icon: const Icon(Icons.edit_document),
+                child: Container(
+                  margin: const EdgeInsets.all(15),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(10.0),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.shade500,
+                        spreadRadius: 1,
+                        blurRadius: 15,
+                        offset: const Offset(4.0, 4.0),
                       ),
-
-                      //delete button
-                      //update button
-                      IconButton(
-                        onPressed: () {
-                          firestoreService.deleteNote(docID);
-                        },
-                        icon: const Icon(Icons.delete),
+                      BoxShadow(
+                        color: Colors.white,
+                        spreadRadius: 1,
+                        blurRadius: 15,
+                        offset: const Offset(-4.0, -4.0),
                       ),
                     ],
+                  ),
+                  child: ListTile(
+                    title: Text(noteText),
                   ),
                 ),
               );
